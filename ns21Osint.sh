@@ -267,6 +267,14 @@ function maltego()
 	echo -e "\n\t${yellow}Ejecución: maltego ${end}\n"
 }
 
+function exiftool()
+{
+	# exiftool
+	echo -e "${cyan}*****  Instalación exiftool  *****${end}"
+	apt-get install -y exiftool # > /dev/null 2>&1
+	check
+	echo -e "\n\t${yellow}Ejecución: exiftool [OPTIONS] FILE ${end}\n"
+}
 
 
 # Main Function
@@ -290,7 +298,8 @@ if [ "$(id -u)" == "0" ]; then  #Comprobamos si somos usuario root
 		# osint-suite-tools
 		# spiderfoot
 		# dmitry
-		maltego
+		# maltego
+		exiftool
 		
 		tput cnorm
 	elif [[ $1 == "" ]];then
