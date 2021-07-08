@@ -72,38 +72,10 @@ function press_key(){
 	echo -e "\n${red}[.] Presiona la tecla Enter para continuar...${end}" && read
 }
 
-function updates_and_dependencies(){
-	# Actualizando el sistema
-	echo -e "${yellow}\n[*] Buscando actualizaciones del sistema...\n${end}"
-	while true; do
-		sudo apt update; check
-		echo -e "\n${purple}[?] ¿Ves que falta actualizar el sistema?${end}"
-		echo -e "${red}[!] Si ha actualizado el sistema anteriormente y hay menos de 50 paquetes por instalar, puede proseguir tranquilamente con la instalación.${end}"
-		echo -ne "\n\t - [${yellow}1${end}] Si\n\t - [${yellow}2${end}] No\n\t - Opción: "
-		read option
-		if [[ $option == 1 ]]; then
-			while true;do
-				echo -e "${yellow}\n[*] Actualizando el sistema Ubuntu...\n${end}"
-				echo -e "\t${cyan}Si ${end}${yellow}sudo apt upgrade${end}"; press_key
-				sudo apt upgrade -y; check
-				break
-			done
-		elif [[ $option == 2 ]]; then
-			break
-		else
-			echo -e "${red}\n[!] Opción incorrecta. Realizando nuevamente la comprobación de las actualizaciones...${end}"
-		fi
-	done
-	clear && banner && echo
-	echo -e "${yellow}\n[*] Instalando dependencias...\n${end}"; press_key
-	sudo apt-get install libxcb-xinerama0-dev libxcb-icccm4-dev libxcb-randr0-dev libxcb-util0-dev libxcb-ewmh-dev libxcb-keysyms1-dev libxcb-shape0-dev -y; check
-}
-
-
 function dependencies(){
 	tput civis
 	clear; banner; echo; 
-	dependencies=(git python3 python3-venv libreadline-dev mongodb pdfgrep)
+	dependencies=(git python3 python3-venv libreadline-dev mongodb pdfgrep default-jre)
 
 	echo -e "${yellow}[*]${end}${gray} Actualizando las fuentes de los programas (apt update)...${end}"
 	apt update; check > /dev/null 2>&1
@@ -283,6 +255,18 @@ function dmitry()
 	echo -e "\n\t${yellow}Ejecución: dmitry ${end}\n"
 }
 
+function maltego()
+{
+	# maltego
+	echo -e "${cyan}*****  Instalación maltego  *****${end}"
+	mkdir $githome/maltego; cd $githome/maltego
+	wget https://maltego-downloads.s3.us-east-2.amazonaws.com/linux/Maltego.v4.2.18.13878.deb # > /dev/null 2>&1
+	check
+	dpkg -i Maltego.v4.2.18.13878.deb # > /dev/null 2>&1
+	check
+	echo -e "\n\t${yellow}Ejecución: maltego ${end}\n"
+}
+
 
 
 # Main Function
@@ -305,7 +289,8 @@ if [ "$(id -u)" == "0" ]; then  #Comprobamos si somos usuario root
 		# osrframework
 		# osint-suite-tools
 		# spiderfoot
-		dmitry
+		# dmitry
+		maltego
 		
 		tput cnorm
 	elif [[ $1 == "" ]];then
