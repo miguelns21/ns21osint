@@ -103,7 +103,7 @@ function updates_and_dependencies(){
 function dependencies(){
 	tput civis
 	clear; banner; echo; 
-	dependencies=(git python3 python3-venv libreadline-dev)
+	dependencies=(git python3 python3-venv libreadline-dev mongodb pdfgrep)
 
 	echo -e "${yellow}[*]${end}${gray} Actualizando las fuentes de los programas (apt update)...${end}"
 	apt update; check > /dev/null 2>&1
@@ -198,8 +198,10 @@ function clonando_repos()
 	# GitHub Repo clones
 	echo -e "${cyan}*****  Instalación de repositorios GitHub  *****${end}"
 	declare -a repos=( \
-	    Datalux/Osintgram \
-	    laramies/theHarvester \
+	    # Datalux/Osintgram \
+	    # laramies/theHarvester \
+	    # lanmaster53/recon-ng \
+	    Quantika14/osint-suite-tools \
 	)
 
 	echo -e "${yel}# ${grn}Clonando repositorios...${end}"
@@ -230,15 +232,35 @@ function theHarvester()
 	echo -e "\n\t${yellow}Ejecución: cd $githome/theHarvester/;python3 theHarvester.py -h ${end}\n"
 }
 
-function Profil3r()
+function recon-ng()
 {
-	# Profil3r  ==> https://github.com/Rog3rSm1th/Profil3r.git
-	echo -e "${cyan}*****  Instalación Profil3r  *****${nc}"
-	pip3 install PyInquirer jinja2 bs4
-	#git clone ya efectuado
-	cd $githome/Profil3r/
-	sudo python3 setup.py install
-	cd ..
+	# recon-ng
+	echo -e "${cyan}*****  Instalación recon-ng  *****${end}"
+	cd $githome/recon-ng
+	pip install -r REQUIREMENTS > /dev/null 2>&1
+	check
+	echo -e "\n\t${yellow}Ejecución: cd $githome/recon-ng/;./recon-ng ${end}\n"
+}
+
+function osrframework()
+{
+	# osrframework
+	echo -e "${cyan}*****  Instalación osrframework  *****${end}"
+	cd $githome/osrframework
+	pip3 install osrframework > /dev/null 2>&1
+	check
+	echo -e "\n\t${yellow}Ejecución: osrf --help ${end}\n"
+}
+
+function osint-suite-tools()
+{
+	# osint-suite-tools
+	echo -e "${cyan}*****  Instalación osint-suite-tools  *****${end}"
+	cd $githome/osint-suite-tools
+	sed -i '1d' requiriments.txt #Existe una dependencia no compatible en la línea 1.
+	pip3 install -r requiriments.txt # > /dev/null 2>&1
+	check
+	echo -e "\n\t${yellow}Ejecución: cd $githome/recon-ng/;python3 BuscadorPersonas.py ${end}\n"
 }
 
 
@@ -256,8 +278,12 @@ if [ "$(id -u)" == "0" ]; then  #Comprobamos si somos usuario root
 		# Por motivos de depuración borraremos el directorio git antes de instalar.
 		rm -rf $githome
 		clonando_repos
-		Osintgram
-		theHarvester
+		# Osintgram
+		# theHarvester
+		# recon-ng
+		# osrframework
+		osint-suite-tools
+		
 		tput cnorm
 	elif [[ $1 == "" ]];then
 		clear; banner; echo; helpPanel;
