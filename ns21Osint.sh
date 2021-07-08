@@ -99,36 +99,30 @@ function dependencies(){
 	done
 }
 
+
 function extensiones_firefox()
 {
-	# Firefox extensions -- https://github.com/mozilla/policy-templates/blob/master/README.md#extensions
+	# Opción que pide permiso para añadirlas despues
+	# wget \ 
+	#  https://addons.mozilla.org/firefox/downloads/latest/1865/addon-1865-latest.xpi \ 
+	#  https://addons.mozilla.org/firefox/downloads/latest/433/addon-433-latest.xpi \
+	#  https://addons.mozilla.org/firefox/downloads/latest/3006/addon-3006-latest.xpi && 
+	# firefox *.xpi && rm *.xpi
+	
+	
 	echo -e "${cyan}*****  Instalación de extensiones para Firefox  *****${nc}"
-	file=/usr/share/firefox-esr/distribution/policies.json
-	src=`head -n -3 $file`
-	ext='    },
-	    "Extensions": {
-	      "Install": [
-		"https://addons.mozilla.org/firefox/downloads/file/3343599/cookie_quick_manager-0.5rc2-an+fx.xpi",
-		"https://addons.mozilla.org/firefox/downloads/file/3616824/foxyproxy_standard-7.5.1-an+fx.xpi",
-		"https://addons.mozilla.org/firefox/downloads/file/3398269/max_hackbar-4.7-fx.xpi",
-		"https://addons.mozilla.org/firefox/downloads/file/898030/gnome_shell_integration-10.1-an+fx-linux.xpi",
-		"https://addons.mozilla.org/firefox/downloads/file/3384326/http_header_live-0.6.5.2-fx.xpi",
-		"https://addons.mozilla.org/firefox/downloads/file/3618861/wappalyzer-6.2.3-fx.xpi"
-	      ]
-	    }
-	  }
-	}'
-	output=`echo -e "$src\n$ext"`
-	echo -e "${yel}# ${grn}Backup del fichero Original:${yel} $file.bak${nc}"
-	if [ ! -f $file.bak ]; then
-	    sudo mv $file $file.bak
-	else
-	    echo -e "${yel}# Backup del fichero ya existe.${nc}"
+	# find profile dir (first profile in the ini file)
+	profiledir=`sed -n -e 's/^.*Path=//p' ${HOME}/.mozilla/firefox/profiles.ini | 
+        	    head -n 1`
+	extensiondir="${HOME}/.mozilla/firefox/${profiledir}/extensions/"
+
+	if [ -z "$profiledir" ]; then
+	    printf "Can't find profile directory."
+	    exit 1
 	fi
-	echo -e "$output" > /tmp/policies.json
-	sudo mv /tmp/policies.json $file
-	sudo chown root:root $file
-	echo -e "\n\n"
+	
+	
+	echo -e "$extensiondir"
 }
 
 
@@ -174,7 +168,7 @@ function clonando_repos()
 	    # laramies/theHarvester \
 	    # lanmaster53/recon-ng \
 	    # Quantika14/osint-suite-tools \
-	    smicallef/spiderfoot \
+	    # smicallef/spiderfoot \
 	)
 
 	echo -e "${yel}# ${grn}Clonando repositorios...${end}"
@@ -290,7 +284,7 @@ if [ "$(id -u)" == "0" ]; then  #Comprobamos si somos usuario root
 		crear_entorno_git
 		# Por motivos de depuración borraremos el directorio git antes de instalar.
 		rm -rf $githome
-		clonando_repos
+		# clonando_repos
 		# Osintgram
 		# theHarvester
 		# recon-ng
@@ -299,14 +293,20 @@ if [ "$(id -u)" == "0" ]; then  #Comprobamos si somos usuario root
 		# spiderfoot
 		# dmitry
 		# maltego
-		exiftool
+		# exiftool
 		
+		tput cnorm
+	elif [[ $1 == "-e" ]];then
+		echo -e "\n${red}[*] Las extensiones deben instalarse como un usuario no root${end}\n"
 		tput cnorm
 	elif [[ $1 == "" ]];then
 		clear; banner; echo; helpPanel;
 	fi
+elif [[ $1 == "-e" ]];then #Instalación de las extensiones de firefox
+	extensiones_firefox
 else
 	echo -e "\n${red}[*] Para la correcta instalación de las herramientas, es necesario ser root${end}\n"
+	tput cnorm
 fi
 
 
