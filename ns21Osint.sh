@@ -201,7 +201,8 @@ function clonando_repos()
 	    # Datalux/Osintgram \
 	    # laramies/theHarvester \
 	    # lanmaster53/recon-ng \
-	    Quantika14/osint-suite-tools \
+	    # Quantika14/osint-suite-tools \
+	    smicallef/spiderfoot \
 	)
 
 	echo -e "${yel}# ${grn}Clonando repositorios...${end}"
@@ -246,7 +247,6 @@ function osrframework()
 {
 	# osrframework
 	echo -e "${cyan}*****  Instalación osrframework  *****${end}"
-	cd $githome/osrframework
 	pip3 install osrframework > /dev/null 2>&1
 	check
 	echo -e "\n\t${yellow}Ejecución: osrf --help ${end}\n"
@@ -258,10 +258,31 @@ function osint-suite-tools()
 	echo -e "${cyan}*****  Instalación osint-suite-tools  *****${end}"
 	cd $githome/osint-suite-tools
 	sed -i '1d' requiriments.txt #Existe una dependencia no compatible en la línea 1.
-	pip3 install -r requiriments.txt # > /dev/null 2>&1
+	pip3 install -r requiriments.txt > /dev/null 2>&1
 	check
-	echo -e "\n\t${yellow}Ejecución: cd $githome/recon-ng/;python3 BuscadorPersonas.py ${end}\n"
+	echo -e "\n\t${yellow}Ejecución: cd $githome/osint-suite-tools/;python3 BuscadorPersonas.py ${end}\n"
 }
+
+
+function spiderfoot()
+{
+	# spiderfoot
+	echo -e "${cyan}*****  Instalación spiderfoot  *****${end}"
+	cd $githome/spiderfoot
+	pip3 install -r requirements.txt > /dev/null 2>&1
+	check
+	echo -e "\n\t${yellow}Ejecución: cd $githome/spiderfoot/;python3 ./sf.py -l 127.0.0.1:5001 ${end}\n"
+}
+
+function dmitry()
+{
+	# dmitry
+	echo -e "${cyan}*****  Instalación dmitry  *****${end}"
+	apt-get install -y dmitry # > /dev/null 2>&1
+	check
+	echo -e "\n\t${yellow}Ejecución: dmitry ${end}\n"
+}
+
 
 
 # Main Function
@@ -282,7 +303,9 @@ if [ "$(id -u)" == "0" ]; then  #Comprobamos si somos usuario root
 		# theHarvester
 		# recon-ng
 		# osrframework
-		osint-suite-tools
+		# osint-suite-tools
+		# spiderfoot
+		dmitry
 		
 		tput cnorm
 	elif [[ $1 == "" ]];then
