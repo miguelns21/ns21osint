@@ -100,30 +100,7 @@ function dependencies(){
 }
 
 
-function extensiones_firefox()
-{
-	# Opción que pide permiso para añadirlas despues
-	# wget \ 
-	#  https://addons.mozilla.org/firefox/downloads/latest/1865/addon-1865-latest.xpi \ 
-	#  https://addons.mozilla.org/firefox/downloads/latest/433/addon-433-latest.xpi \
-	#  https://addons.mozilla.org/firefox/downloads/latest/3006/addon-3006-latest.xpi && 
-	# firefox *.xpi && rm *.xpi
-	
-	
-	echo -e "${cyan}*****  Instalación de extensiones para Firefox  *****${nc}"
-	# find profile dir (first profile in the ini file)
-	profiledir=`sed -n -e 's/^.*Path=//p' ${HOME}/.mozilla/firefox/profiles.ini | 
-        	    head -n 1`
-	extensiondir="${HOME}/.mozilla/firefox/${profiledir}/extensions/"
 
-	if [ -z "$profiledir" ]; then
-	    printf "Can't find profile directory."
-	    exit 1
-	fi
-	
-	
-	echo -e "$extensiondir"
-}
 
 
 function check_desktop()
@@ -254,7 +231,7 @@ function maltego()
 	# maltego
 	echo -e "${cyan}*****  Instalación maltego  *****${end}"
 	mkdir $githome/maltego; cd $githome/maltego
-	wget https://maltego-downloads.s3.us-east-2.amazonaws.com/linux/Maltego.v4.2.18.13878.deb # > /dev/null 2>&1
+	wget https://maltego-downloads.s3.us-east-2.amazonaws.com/linux/Maltego.v4.2.18.13878.deb > /dev/null 2>&1
 	check
 	dpkg -i Maltego.v4.2.18.13878.deb # > /dev/null 2>&1
 	check
@@ -270,6 +247,62 @@ function exiftool()
 	echo -e "\n\t${yellow}Ejecución: exiftool [OPTIONS] FILE ${end}\n"
 }
 
+function extensiones_firefox()
+{
+	# Opción que pide permiso para añadirlas despues
+	echo -e "${cyan}*****  Instalación extensiones  *****${end}"
+	mkdir $githome/extensiones > /dev/null 2>&1 
+	if [ "$(echo $?)" == "0" ]; then  #Si no hay errores
+		cd $githome/extensiones
+	else
+		rm -rf $githome/extensiones
+	fi
+
+	echo -ne "\n${yellow}[*]${endC}${blue} Wappalyzer${end}${purple} $program${end}${blue}...${end}"
+	wget https://addons.mozilla.org/firefox/downloads/file/3802468/addon-3802468-latest.xpi > /dev/null 2>&1 #Wappalyzer 
+	if [ "$(echo $?)" == "0" ]; then  
+		echo -e " ${green}(V)${end}"
+	else
+		echo -e " ${red}(X)${end}\n"
+	fi
+
+	
+	echo -ne "\n${yellow}[*]${endC}${blue} Wyaback Machine${end}${purple} $program${end}${blue}...${end}"
+	wget https://addons.mozilla.org/firefox/downloads/file/929315/addon-929315-latest.xpi > /dev/null 2>&1 #Wyaback Machine
+	if [ "$(echo $?)" == "0" ]; then  
+		echo -e " ${green}(V)${end}"
+	else
+		echo -e " ${red}(X)${end}\n"
+	fi
+	
+	echo -ne "\n${yellow}[*]${endC}${blue} Exit Viewer${end}${purple} $program${end}${blue}...${end}"
+	wget https://addons.mozilla.org/firefox/downloads/file/993242/addon-993242-latest.xpi > /dev/null 2>&1 #Exit Viewer
+	if [ "$(echo $?)" == "0" ]; then  
+		echo -e " ${green}(V)${end}"
+	else
+		echo -e " ${red}(X)${end}\n"
+	fi
+	
+	echo -ne "\n${yellow}[*]${endC}${blue} Sputnik${end}${purple} $program${end}${blue}...${end}"
+	wget https://addons.mozilla.org/firefox/downloads/file/3752246/addon-3752246-latest.xpi > /dev/null 2>&1 #Sputnik
+	if [ "$(echo $?)" == "0" ]; then  
+		echo -e " ${green}(V)${end}"
+	else
+		echo -e " ${red}(X)${end}\n"
+	fi
+	
+	echo -ne "\n${yellow}[*]${endC}${blue} User-Agent Switcher${end}${purple} $program${end}${blue}...${end}"
+	wget https://addons.mozilla.org/firefox/downloads/file/3522684/addon-3522684-latest.xpi > /dev/null 2>&1 #User-Agent Switcher
+	if [ "$(echo $?)" == "0" ]; then  
+		echo -e " ${green}(V)${end}"
+	else
+		echo -e " ${red}(X)${end}\n"
+	fi
+
+	firefox *.xpi && rm *.xpi
+	
+	echo -e "Extensiones instaladas"
+}
 
 # Main Function
 
@@ -293,7 +326,7 @@ if [ "$(id -u)" == "0" ]; then  #Comprobamos si somos usuario root
 		# spiderfoot
 		# dmitry
 		# maltego
-		# exiftool
+		exiftool
 		
 		tput cnorm
 	elif [[ $1 == "-e" ]];then
@@ -302,11 +335,11 @@ if [ "$(id -u)" == "0" ]; then  #Comprobamos si somos usuario root
 	elif [[ $1 == "" ]];then
 		clear; banner; echo; helpPanel;
 	fi
-elif [[ $1 == "-e" ]];then #Instalación de las extensiones de firefox
-	extensiones_firefox
-else
-	echo -e "\n${red}[*] Para la correcta instalación de las herramientas, es necesario ser root${end}\n"
-	tput cnorm
+ elif [[ $1 == "-e" ]];then #Instalación de las extensiones de firefox
+ 	extensiones_firefox
+ else
+ 	echo -e "\n${red}[*] Para la correcta instalación de las herramientas, es necesario ser root${end}\n"
+ 	tput cnorm
 fi
 
 
