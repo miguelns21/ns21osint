@@ -252,55 +252,30 @@ function extensiones_firefox()
 	# Opción que pide permiso para añadirlas despues
 	echo -e "${cyan}*****  Instalación extensiones  *****${end}"
 	mkdir $githome/extensiones > /dev/null 2>&1 
-	if [ "$(echo $?)" == "0" ]; then  #Si no hay errores
-		cd $githome/extensiones
-	else
-		rm -rf $githome/extensiones
-	fi
+	cd $githome/extensiones
 
-	echo -ne "\n${yellow}[*]${endC}${blue} Wappalyzer${end}${purple} $program${end}${blue}...${end}"
-	wget https://addons.mozilla.org/firefox/downloads/file/3802468/addon-3802468-latest.xpi > /dev/null 2>&1 #Wappalyzer 
-	if [ "$(echo $?)" == "0" ]; then  
-		echo -e " ${green}(V)${end}"
-	else
-		echo -e " ${red}(X)${end}\n"
-	fi
-
+ 	#Declaro un diccionarios con los valores
+	declare -A extensiones
+	extensiones[3802468]='Wappalyzer'
+	extensiones['929315']='Wyaback Machine'
+	extensiones['993242']='Exit Viewer'
+	extensiones[3752246]='Sputnik'
+	extensiones['3522684']='User-Agent Switcher'
 	
-	echo -ne "\n${yellow}[*]${endC}${blue} Wyaback Machine${end}${purple} $program${end}${blue}...${end}"
-	wget https://addons.mozilla.org/firefox/downloads/file/929315/addon-929315-latest.xpi > /dev/null 2>&1 #Wyaback Machine
-	if [ "$(echo $?)" == "0" ]; then  
-		echo -e " ${green}(V)${end}"
-	else
-		echo -e " ${red}(X)${end}\n"
-	fi
-	
-	echo -ne "\n${yellow}[*]${endC}${blue} Exit Viewer${end}${purple} $program${end}${blue}...${end}"
-	wget https://addons.mozilla.org/firefox/downloads/file/993242/addon-993242-latest.xpi > /dev/null 2>&1 #Exit Viewer
-	if [ "$(echo $?)" == "0" ]; then  
-		echo -e " ${green}(V)${end}"
-	else
-		echo -e " ${red}(X)${end}\n"
-	fi
-	
-	echo -ne "\n${yellow}[*]${endC}${blue} Sputnik${end}${purple} $program${end}${blue}...${end}"
-	wget https://addons.mozilla.org/firefox/downloads/file/3752246/addon-3752246-latest.xpi > /dev/null 2>&1 #Sputnik
-	if [ "$(echo $?)" == "0" ]; then  
-		echo -e " ${green}(V)${end}"
-	else
-		echo -e " ${red}(X)${end}\n"
-	fi
-	
-	echo -ne "\n${yellow}[*]${endC}${blue} User-Agent Switcher${end}${purple} $program${end}${blue}...${end}"
-	wget https://addons.mozilla.org/firefox/downloads/file/3522684/addon-3522684-latest.xpi > /dev/null 2>&1 #User-Agent Switcher
-	if [ "$(echo $?)" == "0" ]; then  
-		echo -e " ${green}(V)${end}"
-	else
-		echo -e " ${red}(X)${end}\n"
-	fi
+	for i in ${!extensiones[@]}
+	do
+		echo -ne "\n${yellow}[*]${endC}${blue} ${extensiones[$i]}${end}${blue}...${end}"
+		wget "https://addons.mozilla.org/firefox/downloads/file/$i/addon-$i-latest.xpi" #> /dev/null 2>&1 	    
+		if [ "$(echo $?)" == "0" ]; then  
+			echo -e " ${green}(V)${end}"
+		else
+			echo -e " ${red}(X)${end}\n"
+		fi
+	#	echo "La clave del programa ${extensiones[$i]} es $i"
+	done
 
 	firefox *.xpi && rm *.xpi
-	
+
 	echo -e "Extensiones instaladas"
 }
 
@@ -337,6 +312,7 @@ if [ "$(id -u)" == "0" ]; then  #Comprobamos si somos usuario root
 	fi
  elif [[ $1 == "-e" ]];then #Instalación de las extensiones de firefox
  	extensiones_firefox
+
  else
  	echo -e "\n${red}[*] Para la correcta instalación de las herramientas, es necesario ser root${end}\n"
  	tput cnorm
