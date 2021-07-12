@@ -75,7 +75,7 @@ function press_key(){
 function dependencies(){
 	tput civis
 	clear; banner; echo; 
-	dependencies=(git python3 python3-venv libreadline-dev mongodb pdfgrep default-jre)
+	dependencies=(git python3 python3-venv libreadline-dev mongodb pdfgrep default-jre sqlite3)
 
 	echo -e "${yellow}[*]${end}${gray} Actualizando las fuentes de los programas (apt update)...${end}"
 	apt update; check > /dev/null 2>&1
@@ -279,6 +279,21 @@ function extensiones_firefox()
 	echo -e "Extensiones instaladas"
 }
 
+function marcadores_firefox()
+{
+	# Utilizo sqlite3 para la restauración de los marcadores desde sqldump
+	echo -e "${cyan}*****  Instalación marcadores  *****${end}"
+
+	RESULT=`pgrep firefox` 
+	if [ "${RESULT:-null}" = null ]; then 
+		sqlite3 ~/.mozilla/firefox/7fpizqlp.default-release/places.sqlite < backup.dump.sql #> /dev/null 2>&1
+		echo -e "Marcadores instalados"
+	else 
+		echo -e "${red}\n[!] Ocurrió un error: Firefox se está ejecutando.\n${end}"
+	fi
+}
+
+
 # Main Function
 
 if [ "$(id -u)" == "0" ]; then  #Comprobamos si somos usuario root
@@ -312,6 +327,9 @@ if [ "$(id -u)" == "0" ]; then  #Comprobamos si somos usuario root
 	fi
  elif [[ $1 == "-e" ]];then #Instalación de las extensiones de firefox
  	extensiones_firefox
+
+ elif [[ $1 == "-m" ]];then #Instalación de los marcadores de firefox
+ 	marcadores_firefox
 
  else
  	echo -e "\n${red}[*] Para la correcta instalación de las herramientas, es necesario ser root${end}\n"
