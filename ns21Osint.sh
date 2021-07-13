@@ -100,9 +100,6 @@ function dependencies(){
 }
 
 
-
-
-
 function check_desktop()
 {
 	# Desktop environment check
@@ -146,6 +143,7 @@ function clonando_repos()
 	    # lanmaster53/recon-ng \
 	    # Quantika14/osint-suite-tools \
 	    # smicallef/spiderfoot \
+	    thewhiteh4t/nexfil \
 	)
 
 	echo -e "${yel}# ${grn}Clonando repositorios...${end}"
@@ -247,6 +245,17 @@ function exiftool()
 	echo -e "\n\t${yellow}Ejecución: exiftool [OPTIONS] FILE ${end}\n"
 }
 
+function nexfil()
+{
+	# nexfil
+	echo -e "${cyan}*****  Instalación nexfil  *****${end}"
+	cd $githome/nexfil
+	pip3 install -r requirements.txt # > /dev/null 2>&1
+	check
+	echo -e "\n\t${yellow}Ejecución: cd $githome/nexfil/;python3 nexfil.py -h ${end}\n"
+}
+
+
 function extensiones_firefox()
 {
 	# Opción que pide permiso para añadirlas despues
@@ -307,7 +316,7 @@ if [ "$(id -u)" == "0" ]; then  #Comprobamos si somos usuario root
 		crear_entorno_git
 		# Por motivos de depuración borraremos el directorio git antes de instalar.
 		rm -rf $githome
-		# clonando_repos
+		clonando_repos
 		# Osintgram
 		# theHarvester
 		# recon-ng
@@ -316,7 +325,8 @@ if [ "$(id -u)" == "0" ]; then  #Comprobamos si somos usuario root
 		# spiderfoot
 		# dmitry
 		# maltego
-		exiftool
+		# exiftool
+		nexfil
 		
 		tput cnorm
 	elif [[ $1 == "-e" ]];then
