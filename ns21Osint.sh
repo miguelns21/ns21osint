@@ -72,6 +72,14 @@ function check(){
 	fi
 }
 
+function checkV(){
+	if [ "$(echo $?)" == "0" ]; then
+		echo -e " ${green}(V)${end}"
+	else
+		echo -e " ${red}(X)${end}\n"
+	fi; sleep 1
+}
+
 function press_key(){
 	echo -e "\n${red}[.] Presiona la tecla Enter para continuar...${end}" && read
 }
@@ -103,14 +111,12 @@ function dependencies(){
 	done
 }
 
-function crear_entorno_git()
+function crear_entorno_entorno()
 {
 	# Crea el directorio ~/git, asigna $githome, y descarga los ficheros necesarios
-	echo -e "${yellow}[*]${end}${gray}*****  Configuración de Git  *****${end}"
+	echo -e "${yellow}[*]${end}${gray}*****  Configuración de Entorno  *****${end}"
 	if [ ! -d $HOME/git ]; then
-	    mkdir $HOME/git
-	else
-	    echo -e "${red}[*] $HOME/git ya existe.${end}\n"
+	    mkdir $HOME/git  > /dev/null 2>&1
 	fi
 	
 	if [ -d $HOME/Escritorio ]; then
@@ -151,10 +157,10 @@ function clonando_repos()
 	echo -e "${yellow}[*]${end}${gray}*****  Instalación de repositorios GitHub  *****${end}"
 	declare -a repos=( \
 	    Datalux/Osintgram \
-	    #laramies/theHarvester \
-	    #lanmaster53/recon-ng \
-	    #Quantika14/osint-suite-tools \
-	    #smicallef/spiderfoot \
+	    laramies/theHarvester \
+	    lanmaster53/recon-ng \
+	    Quantika14/osint-suite-tools \
+	    smicallef/spiderfoot \
 	    thewhiteh4t/nexfil \
 	)
 
@@ -163,7 +169,6 @@ function clonando_repos()
 		echo -ne "\n${yellow}[*]${endC}${blue} Repositorio ${end}${purple} $repo${end}${blue}...${end}"
 		
 		git clone https://github.com/$repo $githome/$(echo $repo | awk -F '/' '{print $NF}') > /dev/null 2>&1
-		# ln -s $HOME/git/$(echo $repo | awk -F '/' '{print $NF}') $HOME/$userdesktop/$(echo $repo | awk -F '/' '{print $NF}') > /dev/null 2>&1
 		
 		if [ "$(echo $?)" == "0" ]; then
 			echo -e " ${green}(V)${end}"
@@ -176,116 +181,150 @@ function clonando_repos()
 function Osintgram()
 {
 	# Osintgram
-	echo -ne "\n${yellow}[*]${endC}${blue} Instalación Osintgram ${end}${blue}...${end}"
+	echo -ne "\n${yellow}[*]${endC}${blue} Instalación ${end}${purple}Osintgram ${end}${blue}...${end}"
 	cd $githome/Osintgram
 	pip install -r requirements.txt > /dev/null 2>&1
-	if [ "$(echo $?)" == "0" ]; then
-		echo -e " ${green}(V)${end}"
-	else
-		echo -e " ${red}(X)${end}\n"
-	fi; sleep 1
+	checkV
 	
-	echo -e "\n\t${yellow}Ejecución: >cd $githome/Osintgram/;make setup${end}"
-	echo -e "\t\t${yellow}>python3 main.py <target username> ${end}\n"
+	echo -e "\n\t${yellow}Ejecución:${end}\n"
+	echo -e "\t${yellow}\t>cd $githome/Osintgram/;make setup${end}"
+	echo -e "\t${yellow}\t>python3 main.py <target username> ${end}\n"
 	
-	ln -s $HOME/git/$(echo $repo | awk -F '/' '{print $NF}') $userdesktop/Redes_Sociales/$(echo $repo | awk -F '/' '{print $NF}') > /dev/null 2>&1
+	ln -s $githome/Osintgram $userdesktop/Redes_Sociales/Osintgram > /dev/null 2>&1
 }
 
 function nexfil()
 {
 	# nexfil
-	echo -ne "\n${yellow}[*]${endC}${blue} Instalación nexfil ${end}${blue}...${end}"
+	echo -ne "\n${yellow}[*]${endC}${blue} Instalación ${end}${purple}nexfil ${end}${blue}...${end}"
 	cd $githome/nexfil
 	pip3 install -r requirements.txt > /dev/null 2>&1
-	if [ "$(echo $?)" == "0" ]; then
-		echo -e " ${green}(V)${end}"
-	else
-		echo -e " ${red}(X)${end}\n"
-	fi; sleep 1
+	checkV
 	
-	echo -e "\n\t${yellow}Ejecución: cd $githome/nexfil/;python3 nexfil.py -h ${end}\n"
-	ln -s $HOME/git/$(echo $repo | awk -F '/' '{print $NF}') $userdesktop/Redes_Sociales/$(echo $repo | awk -F '/' '{print $NF}') > /dev/null 2>&1
+	echo -e "\n\t${yellow}Ejecución:${end}\n"
+	echo -e "\t${yellow}\t>cd $githome/nexfil/${end}"	
+	echo -e "\t${yellow}\t>python3 nexfil.py -h ${end}\n"
+
+	ln -s $githome/nexfil $userdesktop/Redes_Sociales/nexfil > /dev/null 2>&1
 }
 
 function theHarvester()
 {
 	# theHarvester
-	echo -e "${cyan}*****  Instalación theHarvester  *****${end}"
+	echo -ne "\n${yellow}[*]${endC}${blue} Instalación ${end}${purple}theHarvester ${end}${blue}...${end}"
 	cd $githome/theHarvester
 	python3 -m pip install -r requirements/base.txt > /dev/null 2>&1
-	check
-	echo -e "\n\t${yellow}Ejecución: cd $githome/theHarvester/;python3 theHarvester.py -h ${end}\n"
-}
-
-function recon-ng()
-{
-	# recon-ng
-	echo -e "${cyan}*****  Instalación recon-ng  *****${end}"
-	cd $githome/recon-ng
-	pip install -r REQUIREMENTS > /dev/null 2>&1
-	check
-	echo -e "\n\t${yellow}Ejecución: cd $githome/recon-ng/;./recon-ng ${end}\n"
-}
-
-function osrframework()
-{
-	# osrframework
-	echo -e "${cyan}*****  Instalación osrframework  *****${end}"
-	pip3 install osrframework > /dev/null 2>&1
-	check
-	echo -e "\n\t${yellow}Ejecución: osrf --help ${end}\n"
-}
-
-function osint-suite-tools()
-{
-	# osint-suite-tools
-	echo -e "${cyan}*****  Instalación osint-suite-tools  *****${end}"
-	cd $githome/osint-suite-tools
-	sed -i '1d' requiriments.txt #Existe una dependencia no compatible en la línea 1.
-	pip3 install -r requiriments.txt > /dev/null 2>&1
-	check
-	echo -e "\n\t${yellow}Ejecución: cd $githome/osint-suite-tools/;python3 BuscadorPersonas.py ${end}\n"
-}
-
-
-function spiderfoot()
-{
-	# spiderfoot
-	echo -e "${cyan}*****  Instalación spiderfoot  *****${end}"
-	cd $githome/spiderfoot
-	pip3 install -r requirements.txt > /dev/null 2>&1
-	check
-	echo -e "\n\t${yellow}Ejecución: cd $githome/spiderfoot/;python3 ./sf.py -l 127.0.0.1:5001 ${end}\n"
+	checkV
+	
+	echo -e "\n\t${yellow}Ejecución:${end}\n"
+	echo -e "\t${yellow}\t>cd $githome/theHarvester/;${end}"
+	echo -e "\t${yellow}\t>python3 theHarvester.py -h ${end}\n"
+	
+	ln -s $githome/theHarvester $userdesktop/Email/theHarvester > /dev/null 2>&1
 }
 
 function dmitry()
 {
 	# dmitry
-	echo -e "${cyan}*****  Instalación dmitry  *****${end}"
-	apt-get install -y dmitry # > /dev/null 2>&1
-	check
-	echo -e "\n\t${yellow}Ejecución: dmitry ${end}\n"
+	echo -ne "\n${yellow}[*]${endC}${blue} Instalación ${end}${purple}dmitry ${end}${blue}...${end}"
+	mkdir $githome/dmitry > /dev/null 2>&1;
+	sudo apt-get install -y dmitry > /dev/null 2>&1
+	checkV
+	
+	echo -e "\n\t${yellow}Ejecución:${end}\n"
+	echo -e "\t${yellow}\t>dmitry ${end}\n"
+	
+	ln -s /usr/bin/dmitry $userdesktop/Dominios/dmitry > /dev/null 2>&1
 }
 
 function maltego()
 {
 	# maltego
-	echo -e "${cyan}*****  Instalación maltego  *****${end}"
-	mkdir $githome/maltego; cd $githome/maltego
-	wget https://maltego-downloads.s3.us-east-2.amazonaws.com/linux/Maltego.v4.2.18.13878.deb > /dev/null 2>&1
+	echo -ne "\n${yellow}[*]${endC}${blue} Descargando ${end}${purple}maltego ${end}${blue}...${end}"
+	mkdir $githome/maltego > /dev/null 2>&1; 
+	cd $githome/maltego
+	wget https://maltego-downloads.s3.us-east-2.amazonaws.com/linux/Maltego.v4.2.18.13878.deb #> /dev/null 2>&1
 	check
-	dpkg -i Maltego.v4.2.18.13878.deb # > /dev/null 2>&1
-	check
-	echo -e "\n\t${yellow}Ejecución: maltego ${end}\n"
+	echo -ne "\n${yellow}[*]${endC}${blue} Instalando maltego ${end}${blue}...${end}"
+	sudo dpkg -i Maltego.v4.2.18.13878.deb > /dev/null 2>&1
+	checkV
+	
+	echo -e "\n\t${yellow}Ejecución:${end}\n"
+	echo -e "\t${yellow}\t>maltego ${end}\n"
+	
+	ln -s /usr/bin/maltego $userdesktop/General/maltego > /dev/null 2>&1
+}
+
+function recon-ng()
+{
+	# recon-ng
+	echo -ne "\n${yellow}[*]${endC}${blue} Instalación ${end}${purple}recon-ng ${end}${blue}...${end}"
+	cd $githome/recon-ng
+	pip install -r REQUIREMENTS > /dev/null 2>&1
+	checkV
+	
+	echo -e "\n\t${yellow}Ejecución:${end}\n"
+	echo -e "\t${yellow}\t>cd $githome/recon-ng/${end}"
+	echo -e "\t${yellow}\t>./recon-ng ${end}\n"
+	
+	ln -s $githome/recon-ng $userdesktop/General/recon-ng > /dev/null 2>&1
+}
+
+function dante-osint-suite-tools()
+{
+	# osint-suite-tools
+	echo -ne "\n${yellow}[*]${endC}${blue} Instalación ${end}${purple}osint-suite-tools ${end}${blue}...${end}"
+	cd $githome/osint-suite-tools
+	sed -i '1d' requiriments.txt #Existe una dependencia no compatible en la línea 1.
+	pip3 install -r requiriments.txt > /dev/null 2>&1
+	checkV
+	
+	echo -e "\n\t${yellow}Ejecución:${end}\n"
+	echo -e "\t${yellow}\t>cd $githome/osint-suite-tools/${end}"
+	echo -e "\t${yellow}\t>python3 BuscadorPersonas.py ${end}\n"
+		
+	ln -s $githome/osint-suite-tools $userdesktop/General/osint-suite-tools > /dev/null 2>&1
+}
+
+function osrframework()
+{
+	# osrframework
+	echo -ne "\n${yellow}[*]${endC}${blue} Instalación ${end}${purple}osrframework ${end}${blue}...${end}"
+	pip3 install osrframework > /dev/null 2>&1
+	checkV
+	
+	echo -e "\n\t${yellow}Ejecución:${end}\n"
+	echo -e "\t${yellow}\t>sudo osrf --help ${end}\n"
+	
+	ln -s /usr/local/bin/osrf $userdesktop/General/osrf > /dev/null 2>&1
+}
+
+function spiderfoot()
+{
+	# spiderfoot
+	echo -ne "\n${yellow}[*]${endC}${blue} Instalación ${end}${purple}spiderfoot ${end}${blue}...${end}"
+	cd $githome/spiderfoot
+	pip3 install -r requirements.txt > /dev/null 2>&1
+	checkV
+	
+	echo -e "\n\t${yellow}Ejecución:${end}\n"
+	echo -e "\t${yellow}\t>cd $githome/spiderfoot/${end}"
+	echo -e "\t${yellow}\t>python3 ./sf.py -l 127.0.0.1:5001 ${end}\n"
+	
+	ln -s $githome/spiderfoot $userdesktop/General/spiderfoot > /dev/null 2>&1
 }
 
 function exiftool()
 {
 	# exiftool
-	echo -e "${cyan}*****  Instalación exiftool  *****${end}"
-	apt-get install -y exiftool # > /dev/null 2>&1
-	check
-	echo -e "\n\t${yellow}Ejecución: exiftool [OPTIONS] FILE ${end}\n"
+	echo -ne "\n${yellow}[*]${endC}${blue} Instalación ${end}${purple}exiftool ${end}${blue}...${end}"
+	sudo apt-get install -y exiftool > /dev/null 2>&1
+	checkV
+	
+	echo -e "\n\t${yellow}Ejecución:${end}\n"
+	echo -e "\t${yellow}\t>exiftool [OPTIONS] FILE ${end}\n"
+	
+	ln -s /usr/bin/exiftool $userdesktop/Metadatos/exiftool > /dev/null 2>&1
 }
 
 
@@ -343,6 +382,7 @@ if [ "$(id -u)" == "0" ]; then  #Comprobamos si somos usuario root
 	clear; banner; echo;
 	echo -e "\n${red}[*] Este script instalará herramientas en el perfil de usuario actual.${end}\n"
 	echo -e "${red}[*] Por favor, logeese como un usuario NO root para la correcta instalación.${end}\n"
+	echo -e "${red}[*] El script le solicitará la clave root cuando sea necesario.${end}\n"
 	exit 1;	
 fi
 
@@ -360,40 +400,29 @@ elif [[ $1 == "-a" ]];then
 
 elif [[ $1 == "-i" ]];then
 		clear; banner; echo;
-		crear_entorno_git
+		crear_entorno_entorno
 		# Por motivos de depuración borraremos el directorio git antes de instalar.
 		rm -rf $githome
 		clonando_repos
 		Osintgram
 		nexfil
-		# theHarvester
-		# recon-ng
-		# osrframework
-		# osint-suite-tools
-		# spiderfoot
-		# dmitry
-		# maltego
-		# exiftool
-		#
+		theHarvester
+		dmitry
+		maltego
+		recon-ng
+		dante-osint-suite-tools
+		osrframework
+		spiderfoot 
+		exiftool
+		
 		tput cnorm
 else  #Se ha introducido un parámetro desconocido o no soportado
  	clear; banner; echo; helpPanel;
 fi
 
+
+
 exit 0
-if [ "$(id -u)" == "0" ]; then  #Comprobamos si somos usuario root
-	if [[ $1 == "-h" ]];then
-		clear; banner; echo; helpPanel; 
-	elif [[ $1 == "-c" ]];then
-		dependencies
-		echo -e "\n${purple}[*] Sistema comprobado. Ahora puede ejecutar el script: ./ns21osing.sh -i${end}"
-		tput cnorm
-	elif [[ $1 == "-e" ]];then
-		echo -e "\n${red}[*] Las extensiones deben instalarse como un usuario no root${end}\n"
-		tput cnorm
-	elif [[ $1 == "" ]];then
-		clear; banner; echo; helpPanel;
-	fi
  elif [[ $1 == "-e" ]];then #Instalación de las Extensiones de firefox
  	extensiones_firefox
 
