@@ -36,6 +36,7 @@ file=$(readlink -f $0)
 current_path=$(dirname $file)
 info_path=$current_path/info
 declare githome=$HOME/git
+declare userdesktop=""
 
 trap ctrl_c INT
 
@@ -51,11 +52,14 @@ function ctrl_c(){
 function helpPanel(){
 	echo -e "${cyan}\n[?] Uso: ./ns21Osint.sh${end}"
 	echo -e "\n\t${purple}${end}${yellow} Modo${end}"
-	echo -e "\t\t${red}-c${end} -> Para actualizar el sistema, instalar utilidades y fuentes necesarias..."
+	echo -e "\t\t${red}-a${end} -> Actualizar el sistema e instala requerimientos."
 	echo -e "\t\t${red}-i${end} -> Para instalar las herramientas OSINT"
+	echo -e "\t\t${red}-e${end} -> Para instalar las extensiones Firefox"
+	echo -e "\t\t${red}-m${end} -> Para instalar los marcadores Firefox"
 	echo -e "\t\t${red}-h${end} -> Mostrar este panel de ayuda"
-	echo -e "\n\t${purple}${end}${yellow} Ejemplo:${end}"
-	echo -e "\n\t${purple}./ns21Osint.sh -i ${end}${yellow} Instala las herramientas OSINT${end}\n"
+	echo -e "\n\t${purple}${end}${yellow} Ejemplo de uso:${end}"
+	echo -e "\n\t${purple}./ns21Osint.sh -i ${end}"
+	echo -e "\n\t\t${yellow} Instala las herramientas OSINT${end}\n"
 	exit 0
 }
 
@@ -74,11 +78,11 @@ function press_key(){
 
 function dependencies(){
 	tput civis
-	clear; banner; echo; 
+	 
 	dependencies=(git python3 python3-venv libreadline-dev mongodb pdfgrep default-jre sqlite3)
 
 	echo -e "${yellow}[*]${end}${gray} Actualizando las fuentes de los programas (apt update)...${end}"
-	apt update; check > /dev/null 2>&1
+	sudo apt update; check > /dev/null 2>&1
 	sleep 2
 	
 	echo -e "${yellow}[*]${end}${gray} Comprobando programas necesarios...${end}"
@@ -87,81 +91,120 @@ function dependencies(){
 	for program in "${dependencies[@]}"; do
 		echo -ne "\n${yellow}[*]${endC}${blue} Herramienta${end}${purple} $program${end}${blue}...${end}"
 
-		test -f /usr/bin/$program
+		dpkg -s $program &> /dev/null
 
 		if [ "$(echo $?)" == "0" ]; then
 			echo -e " ${green}(V)${end}"
 		else
 			echo -e " ${red}(X)${end}\n"
-			echo -e "${yellow}[*]${end}${gray} Instalando herramienta ${end}${blue}$program${end}${yellow}...${end}"
+			echo -e "${yellow}[*]${end}${gray} Instalando ${end}${blue}$program${end}${yellow}...${end}"
 			apt-get install $program -y > /dev/null 2>&1
 		fi; sleep 1
 	done
 }
 
-
-function check_desktop()
-{
-	# Desktop environment check
-	echo -e "${cyan}*****  Comprobando la existencia del entorno de escritorio Gnome.  *****${nc}\n"
-	if [ $XDG_CURRENT_DESKTOP != "GNOME" ]; then
-	    echo -e "${red}! *****  ${cyan}Gnome not found. Most changes in this script are Gnome specific.  ${red}*****${nc}"
-		echo -e "${red}! *****           ${yel}Por favor instale el entorno de escritorio de Gnome.            ${red}*****${nc}\n"
-	   
-	fi
-}
-
-
 function crear_entorno_git()
 {
 	# Crea el directorio ~/git, asigna $githome, y descarga los ficheros necesarios
-	echo -e "${cyan}*****  Git setup  *****${nc}"  # -e required for echo to enable backslash escapes
+	echo -e "${yellow}[*]${end}${gray}*****  Configuración de Git  *****${end}"
 	if [ ! -d $HOME/git ]; then
 	    mkdir $HOME/git
 	else
-	    echo -e "${yel}# ${grn}$HOME/git ya existe.${nc}"
+	    echo -e "${red}[*] $HOME/git ya existe.${end}\n"
 	fi
-	if [ ! -d /git ]; then
-	    sudo ln -s $HOME/git /git
-	else
-	    echo -e "${yel}# ${grn}Symlink /git a $HOME/git ya existe.${nc}"
+	
+	if [ -d $HOME/Escritorio ]; then
+		userdesktop=$HOME/Escritorio
+	else 
+		userdesktop=$HOME/Desktop
 	fi
+	
+	#Creo las distintas categorias en el escritorio
+	if [ ! -d $userdesktop/Redes_Sociales ]; then
+	    mkdir $userdesktop/Redes_Sociales  > /dev/null 2>&1
+	fi
+	if [ ! -d $userdesktop/Email ]; then
+	    mkdir $userdesktop/Email  > /dev/null 2>&1
+	fi
+	if [ ! -d $userdesktop/Dominios ]; then
+	    mkdir $userdesktop/Dominios  > /dev/null 2>&1
+	fi
+	if [ ! -d $userdesktop/General ]; then
+	    mkdir $userdesktop/General  > /dev/null 2>&1
+	fi
+	if [ ! -d $userdesktop/Metadatos ]; then
+	    mkdir $userdesktop/Metadatos  > /dev/null 2>&1
+	fi
+	
 	# git clone https://github.com/takieyda/linux_customizations $githome/linux_customizations
-	echo -e "${cyan}Usuario:\t ${yel}`whoami`"
-	echo -e "${cyan}HOME:\t ${yel}$HOME"
-	echo -e "${cyan}GITHOME: ${yel}$githome${nc}"
-	echo -e "\n\n"
+	echo -e "${cyan}Usuario:\t\t ${yel}`whoami`"
+	echo -e "${cyan}HOME:\t\t\t ${yel}$HOME"
+	echo -e "${cyan}GITHOME:\t\t ${yel}$githome${nc}"
+	echo -e "${cyan}Escritorio Usuario:\t ${yel}$userdesktop${nc}"
+	echo -e "\n"
 }
 
 function clonando_repos()
 {
+	tput civis
 	# GitHub Repo clones
-	echo -e "${cyan}*****  Instalación de repositorios GitHub  *****${end}"
+	echo -e "${yellow}[*]${end}${gray}*****  Instalación de repositorios GitHub  *****${end}"
 	declare -a repos=( \
-	    # Datalux/Osintgram \
-	    # laramies/theHarvester \
-	    # lanmaster53/recon-ng \
-	    # Quantika14/osint-suite-tools \
-	    # smicallef/spiderfoot \
+	    Datalux/Osintgram \
+	    #laramies/theHarvester \
+	    #lanmaster53/recon-ng \
+	    #Quantika14/osint-suite-tools \
+	    #smicallef/spiderfoot \
 	    thewhiteh4t/nexfil \
 	)
 
-	echo -e "${yel}# ${grn}Clonando repositorios...${end}"
 	for repo in ${repos[@]}
 	do
-	    git clone https://github.com/$repo $githome/$(echo $repo | awk -F '/' '{print $NF}')
+		echo -ne "\n${yellow}[*]${endC}${blue} Repositorio ${end}${purple} $repo${end}${blue}...${end}"
+		
+		git clone https://github.com/$repo $githome/$(echo $repo | awk -F '/' '{print $NF}') > /dev/null 2>&1
+		# ln -s $HOME/git/$(echo $repo | awk -F '/' '{print $NF}') $HOME/$userdesktop/$(echo $repo | awk -F '/' '{print $NF}') > /dev/null 2>&1
+		
+		if [ "$(echo $?)" == "0" ]; then
+			echo -e " ${green}(V)${end}"
+		else
+			echo -e " ${red}(X)${end}\n"
+		fi; sleep 1
 	done
 }
 
 function Osintgram()
 {
 	# Osintgram
-	echo -e "${cyan}*****  Instalación Osintgram  *****${end}"
+	echo -ne "\n${yellow}[*]${endC}${blue} Instalación Osintgram ${end}${blue}...${end}"
 	cd $githome/Osintgram
 	pip install -r requirements.txt > /dev/null 2>&1
+	if [ "$(echo $?)" == "0" ]; then
+		echo -e " ${green}(V)${end}"
+	else
+		echo -e " ${red}(X)${end}\n"
+	fi; sleep 1
+	
 	echo -e "\n\t${yellow}Ejecución: >cd $githome/Osintgram/;make setup${end}"
 	echo -e "\t\t${yellow}>python3 main.py <target username> ${end}\n"
-	check
+	
+	ln -s $HOME/git/$(echo $repo | awk -F '/' '{print $NF}') $userdesktop/Redes_Sociales/$(echo $repo | awk -F '/' '{print $NF}') > /dev/null 2>&1
+}
+
+function nexfil()
+{
+	# nexfil
+	echo -ne "\n${yellow}[*]${endC}${blue} Instalación nexfil ${end}${blue}...${end}"
+	cd $githome/nexfil
+	pip3 install -r requirements.txt > /dev/null 2>&1
+	if [ "$(echo $?)" == "0" ]; then
+		echo -e " ${green}(V)${end}"
+	else
+		echo -e " ${red}(X)${end}\n"
+	fi; sleep 1
+	
+	echo -e "\n\t${yellow}Ejecución: cd $githome/nexfil/;python3 nexfil.py -h ${end}\n"
+	ln -s $HOME/git/$(echo $repo | awk -F '/' '{print $NF}') $userdesktop/Redes_Sociales/$(echo $repo | awk -F '/' '{print $NF}') > /dev/null 2>&1
 }
 
 function theHarvester()
@@ -245,16 +288,6 @@ function exiftool()
 	echo -e "\n\t${yellow}Ejecución: exiftool [OPTIONS] FILE ${end}\n"
 }
 
-function nexfil()
-{
-	# nexfil
-	echo -e "${cyan}*****  Instalación nexfil  *****${end}"
-	cd $githome/nexfil
-	pip3 install -r requirements.txt # > /dev/null 2>&1
-	check
-	echo -e "\n\t${yellow}Ejecución: cd $githome/nexfil/;python3 nexfil.py -h ${end}\n"
-}
-
 
 function extensiones_firefox()
 {
@@ -265,11 +298,11 @@ function extensiones_firefox()
 
  	#Declaro un diccionarios con los valores
 	declare -A extensiones
-	extensiones[3802468]='Wappalyzer'
-	extensiones['929315']='Wyaback Machine'
-	extensiones['993242']='Exit Viewer'
+	#extensiones[3802468]='Wappalyzer'
+	#extensiones[929315]='Wyaback Machine'
+	#extensiones[3757144]='xlFr'
 	extensiones[3752246]='Sputnik'
-	extensiones['3522684']='User-Agent Switcher'
+	#extensiones[3522684]='User-Agent Switcher'
 	
 	for i in ${!extensiones[@]}
 	do
@@ -282,6 +315,8 @@ function extensiones_firefox()
 		fi
 	#	echo "La clave del programa ${extensiones[$i]} es $i"
 	done
+	
+	@wget "https://addons.mozilla.org/firefox/downloads/file/3757144/xifr-2.1.1-fx.xpi"
 
 	firefox *.xpi && rm *.xpi
 
@@ -304,20 +339,33 @@ function marcadores_firefox()
 
 
 # Main Function
-
 if [ "$(id -u)" == "0" ]; then  #Comprobamos si somos usuario root
-	if [[ $1 == "-h" ]];then
-		clear; banner; echo; helpPanel; 
-	elif [[ $1 == "-c" ]];then
-		dependencies
+	clear; banner; echo;
+	echo -e "\n${red}[*] Este script instalará herramientas en el perfil de usuario actual.${end}\n"
+	echo -e "${red}[*] Por favor, logeese como un usuario NO root para la correcta instalación.${end}\n"
+	exit 1;	
+fi
+
+
+if [[ $1 == "-h" ]] || [[ $1 == "" ]];then
+	clear; banner; echo; helpPanel; 
+elif [[ $1 == "-a" ]];then
+	clear; banner; echo;
+	if [ "$(id -u)" != "0" ]; then  #Comprobamos si somos usuario root
+		echo -e "\n${red}[*] Para la correcta instalación de las herramientas, es necesario ser root${end}\n"
+		dependencies   #Esta opción requiere ser root
 		echo -e "\n${purple}[*] Sistema comprobado. Ahora puede ejecutar el script: ./ns21osing.sh -i${end}"
 		tput cnorm
-	elif [[ $1 == "-i" ]];then
+	fi
+
+elif [[ $1 == "-i" ]];then
+		clear; banner; echo;
 		crear_entorno_git
 		# Por motivos de depuración borraremos el directorio git antes de instalar.
 		rm -rf $githome
 		clonando_repos
-		# Osintgram
+		Osintgram
+		nexfil
 		# theHarvester
 		# recon-ng
 		# osrframework
@@ -326,8 +374,19 @@ if [ "$(id -u)" == "0" ]; then  #Comprobamos si somos usuario root
 		# dmitry
 		# maltego
 		# exiftool
-		nexfil
-		
+		#
+		tput cnorm
+else  #Se ha introducido un parámetro desconocido o no soportado
+ 	clear; banner; echo; helpPanel;
+fi
+
+exit 0
+if [ "$(id -u)" == "0" ]; then  #Comprobamos si somos usuario root
+	if [[ $1 == "-h" ]];then
+		clear; banner; echo; helpPanel; 
+	elif [[ $1 == "-c" ]];then
+		dependencies
+		echo -e "\n${purple}[*] Sistema comprobado. Ahora puede ejecutar el script: ./ns21osing.sh -i${end}"
 		tput cnorm
 	elif [[ $1 == "-e" ]];then
 		echo -e "\n${red}[*] Las extensiones deben instalarse como un usuario no root${end}\n"
@@ -335,10 +394,10 @@ if [ "$(id -u)" == "0" ]; then  #Comprobamos si somos usuario root
 	elif [[ $1 == "" ]];then
 		clear; banner; echo; helpPanel;
 	fi
- elif [[ $1 == "-e" ]];then #Instalación de las extensiones de firefox
+ elif [[ $1 == "-e" ]];then #Instalación de las Extensiones de firefox
  	extensiones_firefox
 
- elif [[ $1 == "-m" ]];then #Instalación de los marcadores de firefox
+ elif [[ $1 == "-m" ]];then #Instalación de los Marcadores de firefox
  	marcadores_firefox
 
  else
