@@ -24,8 +24,9 @@ function banner(){
 	echo
 	echo -e "  \t\t   ${cyan}Instalación básica de herramientas OSINT${end}"
 	echo -e "  \tScript para automatizar la instalación de herramientas OSINT"
-	echo -e "  \t\t\t   Master en ${red}Ciberseguridad${end}"
-	echo -e "  \t\t\t  Creado por ${blue}Miguel Navarro${end}"
+	echo -e "  \t\t\t   Master en ${red}Ciberseguridad 7ª Edición ${end}"
+	echo -e "  \t\t\t   Tutores: ${cyan}Félix Brezo y Yaiza Rubio"${end}
+	echo -e "  \t\t\t  Creado por ${blue}Miguel Navarro Santa${end}"
 }
 
 
@@ -331,46 +332,45 @@ function exiftool()
 function extensiones_firefox()
 {
 	# Opción que pide permiso para añadirlas despues
-	echo -e "${cyan}*****  Instalación extensiones  *****${end}"
+	echo -e "${yellow}[*]${end}${gray}*****  Instalación de extensiones para Firefox  *****${end}"
 	mkdir $githome/extensiones > /dev/null 2>&1 
 	cd $githome/extensiones
 
  	#Declaro un diccionarios con los valores
 	declare -A extensiones
-	#extensiones[3802468]='Wappalyzer'
-	#extensiones[929315]='Wyaback Machine'
-	#extensiones[3757144]='xlFr'
+	extensiones[3802468]='Wappalyzer'
+	extensiones[929315]='Wyaback Machine'
+	extensiones[3757144]='xlFr'
 	extensiones[3752246]='Sputnik'
-	#extensiones[3522684]='User-Agent Switcher'
+	extensiones[3522684]='User-Agent Switcher'
 	
 	for i in ${!extensiones[@]}
 	do
-		echo -ne "\n${yellow}[*]${endC}${blue} ${extensiones[$i]}${end}${blue}...${end}"
-		wget "https://addons.mozilla.org/firefox/downloads/file/$i/addon-$i-latest.xpi" #> /dev/null 2>&1 	    
-		if [ "$(echo $?)" == "0" ]; then  
-			echo -e " ${green}(V)${end}"
-		else
-			echo -e " ${red}(X)${end}\n"
-		fi
-	#	echo "La clave del programa ${extensiones[$i]} es $i"
+		echo -ne "\n${yellow}[*]${endC}${blue} Extensión ${end}${purple}${extensiones[$i]}${end}${blue}...${end}"
+		wget "https://addons.mozilla.org/firefox/downloads/file/$i/addon-$i-latest.xpi" > /dev/null 2>&1 	    
+		checkV
 	done
 	
-	@wget "https://addons.mozilla.org/firefox/downloads/file/3757144/xifr-2.1.1-fx.xpi"
-
 	firefox *.xpi && rm *.xpi
 
-	echo -e "Extensiones instaladas"
+	echo -e "\n\n${cyan}\n[+] Extensiones instaladas con éxito\n${end}"
 }
 
 function marcadores_firefox()
 {
 	# Utilizo sqlite3 para la restauración de los marcadores desde sqldump
-	echo -e "${cyan}*****  Instalación marcadores  *****${end}"
-
-	RESULT=`pgrep firefox` 
+	echo -e "${yellow}[*]${end}${gray}*****  Instalación de marcadores para Firefox  *****${end}"
+	
+	RESULT=`pgrep firefox` #Compruebo sei Firefox está abierto
+	
 	if [ "${RESULT:-null}" = null ]; then 
-		sqlite3 ~/.mozilla/firefox/7fpizqlp.default-release/places.sqlite < backup.dump.sql #> /dev/null 2>&1
-		echo -e "Marcadores instalados"
+		if test -f marcadores.sql; then
+			sqlite3 ~/.mozilla/firefox/*default-release/places.sqlite < marcadores.sql > /dev/null 2>&1
+			
+			echo -e "\n${cyan}\n[+] Marcadores instalados con éxito\n${end}"
+		else
+			echo -e "${red}\n[!] Ocurrió un error: El fichero de marcadores no existe.\n${end}"
+		fi
 	else 
 		echo -e "${red}\n[!] Ocurrió un error: Firefox se está ejecutando.\n${end}"
 	fi
@@ -416,22 +416,15 @@ elif [[ $1 == "-i" ]];then
 		exiftool
 		
 		tput cnorm
-else  #Se ha introducido un parámetro desconocido o no soportado
+ elif [[ $1 == "-e" ]];then #Instalación de las Extensiones de firefox
+ 	clear; banner; echo;
+	extensiones_firefox
+ 	tput cnorm
+ elif [[ $1 == "-m" ]];then #Instalación de los Marcadores de firefox
+ 	clear; banner; echo;
+	marcadores_firefox
+	tput cnorm
+ else  #Se ha introducido un parámetro desconocido o no soportado
  	clear; banner; echo; helpPanel;
 fi
-
-
-
-exit 0
- elif [[ $1 == "-e" ]];then #Instalación de las Extensiones de firefox
- 	extensiones_firefox
-
- elif [[ $1 == "-m" ]];then #Instalación de los Marcadores de firefox
- 	marcadores_firefox
-
- else
- 	echo -e "\n${red}[*] Para la correcta instalación de las herramientas, es necesario ser root${end}\n"
- 	tput cnorm
-fi
-
 
