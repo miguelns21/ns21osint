@@ -69,6 +69,7 @@ function check(){
 		echo -e "${cyan}\n[+] Acción realizada con éxito\n${end}"
 	else
 		echo -e "${red}\n[!] Ocurrió un error\n${end}"
+		tput cnorm
 		exit 1
 	fi
 }
@@ -88,13 +89,13 @@ function press_key(){
 function dependencies(){
 	tput civis
 	 
-	dependencies=(git python3 python3-venv libreadline-dev mongodb pdfgrep default-jre sqlite3)
+	dependencies=(git python3 python3-venv pip libreadline-dev mongodb pdfgrep default-jre sqlite3)
 
-	echo -e "${yellow}[*]${end}${gray} Actualizando las fuentes de los programas (apt update)...${end}"
+	echo -e "${yellow}[*]${end}${gray} Actualizando las fuentes de los programas (apt update)...${end}\n"
 	sudo apt update; check > /dev/null 2>&1
 	sleep 2
 	
-	echo -e "${yellow}[*]${end}${gray} Comprobando programas necesarios...${end}"
+	echo -e "\n${yellow}[*]${end}${gray} Comprobando programas necesarios...${end}"
 	sleep 2
 
 	for program in "${dependencies[@]}"; do
@@ -107,7 +108,7 @@ function dependencies(){
 		else
 			echo -e " ${red}(X)${end}\n"
 			echo -e "${yellow}[*]${end}${gray} Instalando ${end}${blue}$program${end}${yellow}...${end}"
-			apt-get install $program -y > /dev/null 2>&1
+			sudo apt-get install $program -y > /dev/null 2>&1
 		fi; sleep 1
 	done
 }
@@ -142,6 +143,15 @@ function crear_entorno_entorno()
 	if [ ! -d $userdesktop/Metadatos ]; then
 	    mkdir $userdesktop/Metadatos  > /dev/null 2>&1
 	fi
+	
+	test -f /usr/bin/git &> /dev/null
+
+	if [ "$(echo $?)" != "0" ]; then
+		echo -e "${red}\n[!] No existe 'git'. Ejecute ./ns21osint.sh -i para instalar los requisitos mínimos.\n${end}"
+	tput cnorm
+	exit 1
+	fi;
+	
 	
 	# git clone https://github.com/takieyda/linux_customizations $githome/linux_customizations
 	echo -e "${cyan}Usuario:\t\t ${yel}`whoami`"
@@ -184,6 +194,15 @@ function Osintgram()
 	# Osintgram
 	echo -ne "\n${yellow}[*]${endC}${blue} Instalación ${end}${purple}Osintgram ${end}${blue}...${end}"
 	cd $githome/Osintgram
+	
+	test -f /usr/bin/pip &> /dev/null
+
+	if [ "$(echo $?)" != "0" ]; then
+		echo -e "${red}\n[!] No existe 'pip'. Ejecute ./ns21osint.sh -i para instalar los requisitos mínimos.\n${end}"
+	tput cnorm
+	exit 1
+	fi;
+	
 	pip install -r requirements.txt > /dev/null 2>&1
 	checkV
 	
@@ -199,6 +218,15 @@ function nexfil()
 	# nexfil
 	echo -ne "\n${yellow}[*]${endC}${blue} Instalación ${end}${purple}nexfil ${end}${blue}...${end}"
 	cd $githome/nexfil
+	
+	test -f /usr/bin/pip3 &> /dev/null
+
+	if [ "$(echo $?)" != "0" ]; then
+		echo -e "${red}\n[!] No existe 'pip3'. Ejecute ./ns21osint.sh -i para instalar los requisitos mínimos.\n${end}"
+	tput cnorm
+	exit 1
+	fi;
+	
 	pip3 install -r requirements.txt > /dev/null 2>&1
 	checkV
 	
@@ -214,11 +242,20 @@ function theHarvester()
 	# theHarvester
 	echo -ne "\n${yellow}[*]${endC}${blue} Instalación ${end}${purple}theHarvester ${end}${blue}...${end}"
 	cd $githome/theHarvester
+	
+	test -f /usr/bin/python3 &> /dev/null
+
+	if [ "$(echo $?)" != "0" ]; then
+		echo -e "${red}\n[!] No existe 'python3'. Ejecute ./ns21osint.sh -i para instalar los requisitos mínimos.\n${end}"
+	tput cnorm
+	exit 1
+	fi;
+	
 	python3 -m pip install -r requirements/base.txt > /dev/null 2>&1
 	checkV
 	
 	echo -e "\n\t${yellow}Ejecución:${end}\n"
-	echo -e "\t${yellow}\t>cd $githome/theHarvester/;${end}"
+	echo -e "\t${yellow}\t>cd $githome/theHarvester/${end}"
 	echo -e "\t${yellow}\t>python3 theHarvester.py -h ${end}\n"
 	
 	ln -s $githome/theHarvester $userdesktop/Email/theHarvester > /dev/null 2>&1
@@ -244,7 +281,7 @@ function maltego()
 	echo -ne "\n${yellow}[*]${endC}${blue} Descargando ${end}${purple}maltego ${end}${blue}...${end}"
 	mkdir $githome/maltego > /dev/null 2>&1; 
 	cd $githome/maltego
-	wget https://maltego-downloads.s3.us-east-2.amazonaws.com/linux/Maltego.v4.2.18.13878.deb #> /dev/null 2>&1
+	wget https://maltego-downloads.s3.us-east-2.amazonaws.com/linux/Maltego.v4.2.18.13878.deb > /dev/null 2>&1
 	check
 	echo -ne "\n${yellow}[*]${endC}${blue} Instalando maltego ${end}${blue}...${end}"
 	sudo dpkg -i Maltego.v4.2.18.13878.deb > /dev/null 2>&1
@@ -358,13 +395,22 @@ function extensiones_firefox()
 
 function marcadores_firefox()
 {
-	# Utilizo sqlite3 para la restauración de los marcadores desde sqldump
+	# Utilizo sqlite3 para la restauración de los marcadores desde dump
 	echo -e "${yellow}[*]${end}${gray}*****  Instalación de marcadores para Firefox  *****${end}"
 	
 	RESULT=`pgrep firefox` #Compruebo sei Firefox está abierto
 	
 	if [ "${RESULT:-null}" = null ]; then 
 		if test -f marcadores.sql; then
+			
+			test -f /usr/bin/sqlite3 &> /dev/null
+
+			if [ "$(echo $?)" != "0" ]; then
+				echo -e "${red}\n[!] No existe 'sqlite3'. Ejecute ./ns21osint.sh -i para instalar los requisitos mínimos.\n${end}"
+			tput cnorm
+			exit 1
+			fi;
+			
 			sqlite3 ~/.mozilla/firefox/*default-release/places.sqlite < marcadores.sql > /dev/null 2>&1
 			
 			echo -e "\n${cyan}\n[+] Marcadores instalados con éxito\n${end}"
@@ -414,14 +460,16 @@ elif [[ $1 == "-i" ]];then
 		osrframework
 		spiderfoot 
 		exiftool
-		
+		echo -e "\n${purple}[*] Herramientas instaladas con éxito.${end}"
 		tput cnorm
  elif [[ $1 == "-e" ]];then #Instalación de las Extensiones de firefox
  	clear; banner; echo;
+	tput civis
 	extensiones_firefox
  	tput cnorm
  elif [[ $1 == "-m" ]];then #Instalación de los Marcadores de firefox
  	clear; banner; echo;
+	tput civis
 	marcadores_firefox
 	tput cnorm
  else  #Se ha introducido un parámetro desconocido o no soportado
