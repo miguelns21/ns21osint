@@ -380,6 +380,7 @@ function extensiones_firefox()
 	extensiones[3757144]='xlFr'
 	extensiones[3752246]='Sputnik'
 	extensiones[3522684]='User-Agent Switcher'
+	extensiones[3815277]='Search by Image'
 	
 	for i in ${!extensiones[@]}
 	do
