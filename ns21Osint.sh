@@ -57,6 +57,7 @@ function helpPanel(){
 	echo -e "\t\t${red}-i${end} -> Para instalar las herramientas OSINT"
 	echo -e "\t\t${red}-e${end} -> Para instalar las extensiones Firefox"
 	echo -e "\t\t${red}-m${end} -> Para instalar los marcadores Firefox"
+	echo -e "\t\t${red}-u${end} -> Para actualizar el script"
 	echo -e "\t\t${red}-h${end} -> Mostrar este panel de ayuda"
 	echo -e "\n\t${purple}${end}${yellow} Ejemplo de uso:${end}"
 	echo -e "\n\t${purple}./ns21Osint.sh -i ${end}"
@@ -423,6 +424,21 @@ function marcadores_firefox()
 	fi
 }
 
+function actualiza_script()
+{
+	echo -e "${yellow}[*]${end}${gray}*****  Actualización de script  *****${end}"
+	
+	if [ "$(echo $?)" != "0" ]; then
+		echo -e "${red}\n[!] No existe 'git'. Ejecute ./ns21osint.sh -i para instalar los requisitos mínimos.\n${end}"
+		tput cnorm
+		exit 1
+	fi;
+	
+	git clone https://github.com/miguelns21/ns21Osint $githome/ns21osint > /dev/null 2>&1
+	cp $githome/ns21osint/* .
+	echo -e "\n${cyan}\n[+] Script actualizado a la última versión disponible con éxito\n${end}"
+}
+
 
 # Main Function
 if [ "$(id -u)" == "0" ]; then  #Comprobamos si somos usuario root
@@ -472,6 +488,11 @@ elif [[ $1 == "-i" ]];then
  	clear; banner; echo;
 	tput civis
 	marcadores_firefox
+	tput cnorm
+ elif [[ $1 == "-u" ]];then #Actualización del script y del fichero de marcadores a través de github
+ 	clear; banner; echo;
+	tput civis
+	actualiza_script
 	tput cnorm
  else  #Se ha introducido un parámetro desconocido o no soportado
  	clear; banner; echo; helpPanel;
