@@ -33,15 +33,25 @@ Ejecute en el terminal de la distribución:
 El script admite una serie de parámetros que se explican a continuación.
 
 - Ayuda (opción -h).
+
 Muestra la ayuda del programa.
+
 - Requerimientos (opción -a).
+
 Actualizar el sistema e instala requerimientos.
 - Herramientas (opción -i). 
+
 Para instalar las herramientas OSINT.
 Aquí se instalaran herramientas que son descargadas de repositorios github (Osintgram, theHarvester, recon-ng, spiderfoot, nexfil, etc.), otras disponibles como ficheros descargables (maltego) y otras disponibles en la propia distribución base pero no instaladas por defecto (dmitry).
+
 - Actualización (opción -u).
+
 Actualiza el script y el fichero de marcadores conectándose al repositorio y clonándolo.
+
 - Extensiones (opción -e).
+
 Para instalar las extensiones Firefox.
+
 - Marcadores (opción -m).
+
 Para instalar los marcadores Firefox.
