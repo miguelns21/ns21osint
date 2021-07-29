@@ -1,4 +1,4 @@
-# ns21Osint.sh
+# ns21osint.sh
 
 **OSINT**: Es una metodología "de recolección, análisis y toma de decisiones sobre datos de fuentes disponibles de forma pública para ser utilizados en un contesto de inteligencia".
 
