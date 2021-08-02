@@ -382,17 +382,26 @@ function extensiones_firefox()
 	extensiones[3752246]='Sputnik'
 	extensiones[3522684]='User-Agent Switcher'
 	extensiones[3815277]='Search by Image'
+	extensiones[3645240]='hunter.io'
+	extensiones[3816197]='Fireshot'
 	
-	for i in ${!extensiones[@]}
-	do
-		echo -ne "\n${yellow}[*]${endC}${blue} Extensión ${end}${purple}${extensiones[$i]}${end}${blue}...${end}"
-		wget "https://addons.mozilla.org/firefox/downloads/file/$i/addon-$i-latest.xpi" > /dev/null 2>&1 	    
-		checkV
-	done
+	RESULT=`pgrep firefox` #Compruebo si Firefox está abierto
 	
-	firefox *.xpi && rm *.xpi
-
-	echo -e "\n\n${cyan}\n[+] Extensiones instaladas con éxito\n${end}"
+	if [ "${RESULT:-null}" = null ]; then 
+	
+		for i in ${!extensiones[@]}
+		do
+			echo -ne "\n${yellow}[*]${endC}${blue} Extensión ${end}${purple}${extensiones[$i]}${end}${blue}...${end}"
+			wget "https://addons.mozilla.org/firefox/downloads/file/$i/addon-$i-latest.xpi" > /dev/null 2>&1 	    
+			checkV
+		done
+	
+		firefox *.xpi && rm *.xpi &
+		
+		echo -e "\n\n${cyan}\n[+] Extensiones instaladas con éxito\n${end}"
+	else 
+		echo -e "${red}\n[!] Ocurrió un error: Firefox se está ejecutando.\n${end}"
+	fi
 }
 
 function marcadores_firefox()
@@ -400,7 +409,7 @@ function marcadores_firefox()
 	# Utilizo sqlite3 para la restauración de los marcadores desde dump
 	echo -e "${yellow}[*]${end}${gray}*****  Instalación de marcadores para Firefox  *****${end}"
 	
-	RESULT=`pgrep firefox` #Compruebo sei Firefox está abierto
+	RESULT=`pgrep firefox` #Compruebo si Firefox está abierto
 	
 	if [ "${RESULT:-null}" = null ]; then 
 		if test -f marcadores.sql; then
