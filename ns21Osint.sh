@@ -38,6 +38,7 @@ file=$(readlink -f $0)
 current_path=$(dirname $file)
 info_path=$current_path/info
 declare githome=$HOME/git
+declare extensionhome=$HOME/extensiones
 declare userdesktop=""
 
 trap ctrl_c INT
@@ -118,7 +119,7 @@ function dependencies(){
 function crear_entorno_entorno()
 {
 	# Crea el directorio ~/git, asigna $githome, y descarga los ficheros necesarios
-	echo -e "${yellow}[*]${end}${gray}*****  Configuración de Entorno  *****${end}"
+	echo -e "${gray}*****  Configuración de Entorno Git *****${end}"
 	if [ ! -d $HOME/git ]; then
 	    mkdir $HOME/git  > /dev/null 2>&1
 	fi
@@ -165,7 +166,7 @@ function clonando_repos()
 {
 	tput civis
 	# GitHub Repo clones
-	echo -e "${yellow}[*]${end}${gray}*****  Instalación de repositorios GitHub  *****${end}"
+	echo -e "${gray}*****  Instalación de repositorios GitHub  *****${end}"
 	declare -a repos=( \
 	    Datalux/Osintgram \
 	    laramies/theHarvester \
@@ -365,15 +366,27 @@ function exiftool()
 	ln -s /usr/bin/exiftool $userdesktop/Metadatos/exiftool > /dev/null 2>&1
 }
 
+function crear_entorno_entorno_extensiones()
+{
+	# Crea el directorio $extensionhome, y descarga los ficheros necesarios
+	echo -e "${gray}*****  Configuración de Entorno de Extensiones *****${end}"
+	if [ ! -d $extensionhome ]; then
+	    mkdir $extensionhome  > /dev/null 2>&1
+	fi
+	
+	echo -e "${cyan}Usuario:\t\t ${yel}`whoami`"
+	echo -e "${cyan}HOME:\t\t\t ${yel}$HOME"
+	echo -e "${cyan}EXTENSIONES:\t\t ${yel}$extensionhome${nc}"
+	echo -e "\n"
+}
+
 
 function extensiones_firefox()
 {
 	# Opción que pide permiso para añadirlas despues
-	echo -e "${yellow}[*]${end}${gray}*****  Instalación de extensiones para Firefox  *****${end}"
-	mkdir $HOME/git  > /dev/null 2>&1
-	mkdir $githome/extensiones > /dev/null 2>&1 
+	echo -e "${gray}*****  Instalación de extensiones para Firefox  *****${end}"
 	
-	cd $githome/extensiones
+	cd $HOME/extensiones
 
  	#Declaro un diccionarios con los valores
 	declare -A extensiones
@@ -497,6 +510,7 @@ elif [[ $1 == "-i" ]];then
 		tput cnorm
  elif [[ $1 == "-e" ]];then #Instalación de las Extensiones de firefox
  	clear; banner; echo;
+	crear_entorno_entorno_extensiones
 	tput civis
 	extensiones_firefox
  	tput cnorm
