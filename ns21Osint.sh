@@ -370,7 +370,9 @@ function extensiones_firefox()
 {
 	# Opción que pide permiso para añadirlas despues
 	echo -e "${yellow}[*]${end}${gray}*****  Instalación de extensiones para Firefox  *****${end}"
+	mkdir $HOME/git  > /dev/null 2>&1
 	mkdir $githome/extensiones > /dev/null 2>&1 
+	
 	cd $githome/extensiones
 
  	#Declaro un diccionarios con los valores
