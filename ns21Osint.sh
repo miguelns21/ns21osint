@@ -27,6 +27,7 @@ function banner(){
 	echo -e "  \t\t\t   Master en ${red}Ciberseguridad 7ª Edición ${end}"
 	echo -e "  \t\t\t   Tutores: ${cyan}Félix Brezo y Yaiza Rubio"${end}
 	echo -e "  \t\t\t  Creado por ${blue}Miguel Navarro Santa${end}"
+	echo -e "  \t\t\t  Versión ${blue}1.0${end}"
 }
 
 
