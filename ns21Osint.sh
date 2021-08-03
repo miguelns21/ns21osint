@@ -153,8 +153,6 @@ function crear_entorno_entorno()
 	exit 1
 	fi;
 	
-	
-	# git clone https://github.com/takieyda/linux_customizations $githome/linux_customizations
 	echo -e "${cyan}Usuario:\t\t ${yel}`whoami`"
 	echo -e "${cyan}HOME:\t\t\t ${yel}$HOME"
 	echo -e "${cyan}GITHOME:\t\t ${yel}$githome${nc}"
