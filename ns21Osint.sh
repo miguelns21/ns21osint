@@ -91,7 +91,7 @@ function press_key(){
 function dependencies(){
 	tput civis
 	 
-	dependencies=(git python3 python3-venv pip libreadline-dev mongodb pdfgrep default-jre sqlite3)
+	dependencies=(git python3 python3-venv python3-pip libreadline-dev mongodb pdfgrep default-jre sqlite3 firefox)
 
 	echo -e "${yellow}[*]${end}${gray} Actualizando las fuentes de los programas (apt update)...${end}\n"
 	sudo apt update; check > /dev/null 2>&1
@@ -408,27 +408,33 @@ function marcadores_firefox()
 	# Utilizo sqlite3 para la restauración de los marcadores desde dump
 	echo -e "${yellow}[*]${end}${gray}*****  Instalación de marcadores para Firefox  *****${end}"
 	
-	RESULT=`pgrep firefox` #Compruebo si Firefox está abierto
+	#Existe el perfil del usuario
+	if test -f ~/.mozilla/firefox/*default-release/places.sqlite; then
 	
-	if [ "${RESULT:-null}" = null ]; then 
-		if test -f marcadores.sql; then
+		RESULT=`pgrep firefox` #Compruebo si Firefox está abierto
+	
+		if [ "${RESULT:-null}" = null ]; then 
+			if test -f marcadores.sql; then
 			
-			test -f /usr/bin/sqlite3 &> /dev/null
+				test -f /usr/bin/sqlite3 &> /dev/null
 
-			if [ "$(echo $?)" != "0" ]; then
-				echo -e "${red}\n[!] No existe 'sqlite3'. Ejecute ./ns21osint.sh -i para instalar los requisitos mínimos.\n${end}"
-			tput cnorm
-			exit 1
-			fi;
+				if [ "$(echo $?)" != "0" ]; then
+					echo -e "${red}\n[!] No existe 'sqlite3'. Ejecute ./ns21osint.sh -i para instalar los requisitos mínimos.\n${end}"
+				tput cnorm
+				exit 1
+				fi;
 			
-			sqlite3 ~/.mozilla/firefox/*default-release/places.sqlite < marcadores.sql > /dev/null 2>&1
+				sqlite3 ~/.mozilla/firefox/*default-release/places.sqlite < marcadores.sql > /dev/null 2>&1
 			
-			echo -e "\n${cyan}\n[+] Marcadores instalados con éxito\n${end}"
-		else
-			echo -e "${red}\n[!] Ocurrió un error: El fichero de marcadores no existe.\n${end}"
+				echo -e "\n${cyan}\n[+] Marcadores instalados con éxito\n${end}"
+			else
+				echo -e "${red}\n[!] Ocurrió un error: El fichero de marcadores no existe.\n${end}"
+			fi
+		else 
+			echo -e "${red}\n[!] Ocurrió un error: Firefox se está ejecutando.\n${end}"
 		fi
-	else 
-		echo -e "${red}\n[!] Ocurrió un error: Firefox se está ejecutando.\n${end}"
+	else
+		echo -e "${red}\n[!] Ocurrió un error: Debe ejecutar Firefox una vez para que se cree su perfil de usuario.\n${end}"
 	fi
 }
 
